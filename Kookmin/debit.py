@@ -151,7 +151,7 @@ def cate_page(url,cateIdx):
         created_at.append(formatted_now)
 
     
-url = 'https://card.kbcard.com/CRD/DVIEW/HCAMCXPRICAC0047?pageNo=1&cateIdx='
+url = 'https://card.kbcard.com/CRD/DVIEW/HCAMCXPRICAC0056?pageNo=1&cateIdx='
 for i in range (1, 12):
     cateIdx = str(i)
     cate_page(url,cateIdx)
