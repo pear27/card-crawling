@@ -128,7 +128,6 @@ for i in range(len(card_urls)):
                 benefit += next_sibling.text.strip()
 
     benefits.append(benefit)
-    print(benefits)
 
 print("작업을 완료했습니다.")
 driver.quit()

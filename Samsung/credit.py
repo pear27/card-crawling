@@ -134,7 +134,7 @@ for i in range(len(card_urls)):
 
             benefit += f'[{title.text.strip()}]'
             next_sibling = title.find_next_sibling()
-            if next_sibling.name == 'div' and 'table_col' in next_sibling.get('class', []):
+            if next_sibling is not None and next_sibling.name == 'div' and 'table_col' in next_sibling.get('class', []):
                 table = next_sibling.select_one('table')
                 if table:
                     rows = table.find_all('tr')
@@ -146,24 +146,23 @@ for i in range(len(card_urls)):
                         sentence = f"표의 {j + 1}번째 행은 {row_string}로 이루어져 있습니다."
                         benefit += sentence
 
-            elif next_sibling.name == 'ul':
+            elif next_sibling is not None and next_sibling.name == 'ul':
                 benefit += next_sibling.text.strip()
 
-        benefits.append(benefit)
-        print(benefit)
+    benefits.append(benefit)
 
 print("작업을 완료했습니다.")
 driver.quit()
 
 '''
-    체크 카드 혜택 크롤링
-    debit_benefit.csv : card_company_id, name, img_url, benefits, created_at, type
+    신용 카드 혜택 크롤링
+    credit_benefit.csv : card_company_id, name, img_url, benefits, created_at, type
 '''
 
 data = {"card_company_id": card_company_id, "name": name, "img_url": img_url, "benefits" : benefits, "created_at": created_at, "type": type}
 df = pd.DataFrame(data)
 
-df.to_csv("./debit_benefit.csv", encoding = "utf-8-sig", index=False)
+df.to_csv("./credit_benefit.csv", encoding = "utf-8-sig", index=False)
 
 
 
