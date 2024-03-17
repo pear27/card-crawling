@@ -236,5 +236,5 @@ type = ["CreditCard"] * len(name)
 data = {"card_company_id":card_company_id, "name" : name, "img_url" : img_url, "benefits": benefits, "created_at": created_at,"type":type}
 df = pd.DataFrame(data)
  
-df.to_csv("credit_benefit.csv", encoding = "utf-8-sig")
+df.to_csv("credit_benefit.csv", encoding = "utf-8-sig", index=False)
 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+" 롯데카드 신용카드 크롤링 완료")
