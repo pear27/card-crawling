@@ -71,6 +71,14 @@ benefits = []
 created_at = []
 type = ["CreditCard"] * len(card_urls)
 
+# 크롤링 정보 정리 (특수문자 제거 및 줄바꿈 제거)
+def remove_blank(text):
+
+    text_str = str(text)
+    cleaned_text = ' '.join(text_str.split())
+
+    return cleaned_text
+
 print("======= [현대] 전체 카드 혜택 정보 크롤링 =======")
 for i in range(len(card_urls)):
 
@@ -99,15 +107,31 @@ for i in range(len(card_urls)):
 
     for i in range(len(popup_containers)):
         title = popup_containers[i].find('div', class_='layer_head')
-        if title and (title.text.strip()[-2:] == "적립" or title.text.strip()[-2:] == "사용"
-                      or title.text.strip()[-2:] == "할인" or title.text.strip()[-5:] == "업그레이드"
-                      or title.text.strip()[-3:] == "보너스" or title.text.strip()[-3:] == "서비스"
-                      or title.text.strip()[-3:] == "트래블" or title.text.strip()[-3:] == "리워드"):
+        if title and (title.text.strip()[-2:] in ["적립"]):
             benefit += f'###{title.text.strip()}'
-            item_list = popup_containers[i].find('div', class_='layer_body')
-            benefit += item_list.text.strip()
+            benefit_container= popup_containers[i].find('div', class_='layer_body')
+            benefit_title = benefit_container.find('div', class_='box_top_tit')
+            benefit_body = benefit_title.find_next_sibling()
+            benefit += f'[{benefit_title.text.strip()}]'
+            benefit += benefit_body.text.strip()
 
-    benefits.append(benefit)
+        if title and (title.text.strip()[-2:] in ["사용", "제공"]):
+            benefit += f'###{title.text.strip()}'
+            benefit_container= popup_containers[i].find('div', class_='layer_body')
+            benefit_title_list = benefit_container.find_all('div', class_='box_tit')
+            for benefit_title in benefit_title_list:
+                benefit += f'[{benefit_title.text.strip()}]'
+                benefit_body = benefit_title.find_next_sibling()
+                if benefit_body and not benefit_body.find('div', class_="accodWrap") and not benefit_body.find('div', class_="box_bg_gray"):
+                    benefit += benefit_body.text.strip()
+                elif benefit_body.find('div', class_="accodWrap"):
+                    benefit_detail = benefit_body.find('div', class_="box_title02").text.strip()
+                    benefit += benefit_detail
+                else:
+                    benefit_detail = benefit_body.find('div', class_="box_img_middle").text.strip()
+                    benefit += benefit_detail
+
+    benefits.append(remove_blank(benefit))
 
 print("작업을 완료했습니다.")
 driver.quit()
@@ -121,6 +145,3 @@ data = {"card_company_id": card_company_id, "name": name, "img_url": img_url, "b
 df = pd.DataFrame(data)
 
 df.to_csv("./debit_benefit.csv", encoding = "utf-8-sig", index=False)
-
-
-
