@@ -111,14 +111,6 @@ for i in range(len(card_urls)):
                 table = next_sibling.select_one('table')
                 if table:
                     benefit += str (table).replace('\n','').replace('\r','').replace('\t','')
-                    # rows = table.find_all('tr')
-                    # for j, row in enumerate(rows):
-                    #     cells = row.find_all(['th', 'td'])
-                    #     row_data = ['(' + cell.text.strip() + ')' for cell in cells]
-                    #     row_string = ' '.join(row_data)
-
-                    #     sentence = f"표의 {j + 1}번째 행은 {row_string}로 이루어져 있습니다."
-                    #     benefit += sentence
 
             elif next_sibling is not None and next_sibling.name == 'ul':
                 benefit += next_sibling.text.strip().replace('\n','')
