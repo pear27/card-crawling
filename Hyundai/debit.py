@@ -69,7 +69,7 @@ card_company_id = [2] * len(card_urls)
 benefits = []
 
 created_at = []
-type = ["CreditCard"] * len(card_urls)
+type = ["DebitCard"] * len(card_urls)
 
 # 크롤링 정보 정리 (특수문자 제거 및 줄바꿈 제거)
 def remove_blank(text):
