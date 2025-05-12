@@ -8,6 +8,14 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
+import json
+
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
+chrome_path = config.get("chrome_path")
+
+
 '''
     신용 카드 리스트 조회
     hyundai_creditcardInfos.csv : card_name, card_url, card_img
@@ -15,6 +23,10 @@ from bs4 import BeautifulSoup
 url = "https://www.hyundaicard.com/cpc/ma/CPCMA0101_01.hc?cardflag=ALL"
 
 chrome_options = Options()
+
+# Chrome 설치된 경로로 변경
+chrome_options.binary_location = chrome_path  
+
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-web-security')
 
@@ -349,10 +361,10 @@ for i in range(len(card_section)):
             card_img_element = element.find('img').get('src')
             card_imgs.append(card_img_element)
 
-            card_url_a = element.find('a')
-            card_url = card_url_a.get('href')
-            print('코드' + card_url)
-            card_urls.append('https://www.hyundaicard.com' + card_url)
+            # card_img_element의 "card_" 다음과 "_h.png" 이전 문자열 추출
+            card_url_code = card_img_element.split('card_')[1].replace('_h.png', '')
+            print('코드' + card_url_code)
+            card_urls.append('https://www.hyundaicard.com/cpc/cr/CPCCR0201_01.hc?cardWcd=' + card_url_code)
             continue
 
 
@@ -408,6 +420,10 @@ print("======= [현대] 전체 카드 혜택 정보 크롤링 =======")
 for i in range(len(card_urls)):
 
     chrome_options = Options()
+
+    # Chrome 설치된 경로로 변경
+    chrome_options.binary_location = chrome_path  
+        
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-web-security')
 
