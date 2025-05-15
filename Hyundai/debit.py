@@ -8,6 +8,15 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
+import re
+
+import json
+
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
+chrome_path = config.get("chrome_path")
+
 '''
     체크 카드 리스트 조회
     hyundai_checkcardInfos.csv : card_name, card_url, card_img
@@ -15,13 +24,17 @@ from bs4 import BeautifulSoup
 url = "https://www.hyundaicard.com/cpc/cr/CPCCR0621_11.hc?cardflag=C#aTab_2"
 
 chrome_options = Options()
+
+# Chrome 설치된 경로로 변경
+chrome_options.binary_location = chrome_path  
+
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-web-security')
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
 driver.implicitly_wait(20)
-print("======= [현대] 신용 카드 리스트 크롤링 =======")
+print("======= [현대] 체크 카드 리스트 크롤링 =======")
 print("웹 페이지에 접속 중...")
 driver.get(url)
 time.sleep(3)
@@ -56,9 +69,10 @@ df = pd.DataFrame(data)
 df.to_csv("./hyundai_checkcardInfos.csv", encoding = "utf-8-sig")
 
 '''
-    신용 카드 혜택 크롤링
+    체크 카드 혜택 크롤링
     debit_benefit.csv : card_company_id, name, img_url, benefits, created_at, type
 '''
+
 card_infos = pd.read_csv('./hyundai_checkcardInfos.csv')
 
 card_urls = card_infos['card_url'].tolist()
@@ -83,6 +97,10 @@ print("======= [현대] 전체 카드 혜택 정보 크롤링 =======")
 for i in range(len(card_urls)):
 
     chrome_options = Options()
+
+    # Chrome 설치된 경로로 변경
+    chrome_options.binary_location = chrome_path  
+
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-web-security')
 
@@ -136,11 +154,11 @@ for i in range(len(card_urls)):
 print("작업을 완료했습니다.")
 driver.quit()
 
+
 '''
     체크 카드 혜택 크롤링
     debit_benefit.csv : card_company_id, name, img_url, benefits, created_at, type
 '''
-
 data = {"card_company_id": card_company_id, "name": name, "img_url": img_url, "benefits" : benefits, "created_at": created_at, "type": type}
 df = pd.DataFrame(data)
 
