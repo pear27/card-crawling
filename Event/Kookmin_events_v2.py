@@ -157,8 +157,8 @@ def eventList(is_brand_sale):
         print("✅ 이벤트 정보를 Kookmin_KBevent_list.csv로 저장 완료.")
 
 
-#eventList(True)  # 브랜드 할인 목록 크롤링
-#eventList(False)  # KB 이벤트 목록 크롤링
+eventList(True)  # 브랜드 할인 목록 크롤링
+eventList(False)  # KB 이벤트 목록 크롤링
 
 
 # 이벤트 상세 정보 크롤링 함수
