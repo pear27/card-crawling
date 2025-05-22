@@ -15,6 +15,8 @@ from datetime import datetime
 # 이벤트 목록 크롤링 함수
 def eventList():
 
+    print("======= [국민] KB 이벤트 정보 리스트업 =======")
+
     event_codes = []
     event_images = []
     event_subjects = []
@@ -29,12 +31,12 @@ def eventList():
     paging_div = soup1.find('div', class_='paging')
     page_links = paging_div.find_all('a', href=True)
 
-    print(len(page_links))
-
     driver = webdriver.Chrome()
     driver.get('https://card.kbcard.com/BON/DVIEW/HBBMCXCRVNEC0001')
     
     for page in range(1, len(page_links) + 1):
+        print(f"{datetime.now()} [{page}/{len(page_links)}] --- 웹 페이지에 접속 중...")
+        
         # JavaScript 함수 호출
         driver.execute_script(f'doSearchSpider("HBBMCXCRVNEC0001", "{page}")')
         time.sleep(2)  # 페이지 로딩 대기
@@ -109,4 +111,49 @@ def eventList():
     print("✅ 이벤트 정보를 kbcard_event_list.csv로 저장 완료.")
 
 
-eventList()
+eventList() # KB 이벤트 목록 크롤링
+
+
+def eventDetail():
+
+    event_infos = pd.read_csv('./KB_Kookmin_eventInfos.csv')
+
+    event_subjects = event_infos['event_subject'].to_list()    
+    event_urls = []
+    event_images = event_infos['event_image'].to_list()
+    event_details = []
+    event_codes = event_infos['event_code'].to_list()
+    created_at = []
+
+    '''
+    card_company_id = [5] * len(card_urls)
+    type = ["DebitCard"] * len(card_urls)
+    '''
+
+    print("======= [국민] KB 이벤트 상세 정보 크롤링 (전체) =======")
+    for i in range(len(event_codes)):
+        event_url = 'https://card.kbcard.com/BON/DVIEW/HBBMCXCRVNEC0001?mainCC=a&eventNum=' + str(event_codes[i])
+        html = urlopen(event_url)
+        soup = BeautifulSoup(html, 'html.parser')
+
+        event_urls.append(event_url)
+        created_at.append(datetime.now())
+        
+        print(f"{datetime.now} [{event_subjects[i]}] --- 웹 페이지에 접속 중... ({i+1}/{len(event_codes)})")
+
+        event_body = soup.find('div', {'id': 'eventBodyRE'})
+        if event_body:
+            detail_elements = event_body.find_all(['p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+            detail = ', '.join(elem.get_text(strip=True) for elem in detail_elements)
+            event_details.append(detail)
+
+
+    data = {"event_subject" : event_subjects, "event_url" : event_urls, "event_image" : event_images, 
+            "event_detail": event_details, "event_code" : event_codes, "created_at": created_at}
+    df = pd.DataFrame(data)
+
+    df.to_csv("./Event/Kookmin_events_detail.csv", encoding = "utf-8-sig")
+    print("Kookmin_events_detail.csv가 생성되었습니다.")
+
+eventDetail();  # KB 이벤트 상세 정보 추출
+
